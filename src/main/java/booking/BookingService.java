@@ -1,41 +1,75 @@
 package booking;
 
 import car.Car;
+import car.CarDao;
 import car.CarService;
 import user.User;
-import user.UserService;
+import user.UserDao;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static Utils.CustomerInputUtil.takeCustomerInput;
 
 public class BookingService {
 
-    private BookingServiceDao bookingServiceDao;
+    private static final BookingServiceDao bookingServiceDao;
 
-    {
+    static {
         bookingServiceDao = new BookingServiceDao();
+
     }
 
     public void bookCar() {
         String customerId = takeCustomerId();
-        Car[] cars = doYouWantElectricalCar();
-        Car car = takeCarBrand(cars);
+
+        Car car = chooseCarByRegNumber();
+
+        CarDao.takeCar(car.getRegNumber());
 
         Booking booking = new Booking();
+        booking.setId(UUID.randomUUID());
+        booking.setLocalDateTime(LocalDateTime.now());
         booking.setCar(car);
-        booking.setId(UUID.fromString(customerId));
+        booking.setUser(UserDao.getUser(customerId));
+
+
 
         bookingServiceDao.addBooking(booking);
+    }
+
+    public void viewAllBookings() {
+        Booking[] bookings = bookingServiceDao.viewAllBookings();
+
+        List<Booking> filteredBookings = Arrays.stream(bookings)
+                .filter(Objects::nonNull)
+                .toList();
+
+        printBookings(filteredBookings);
+    }
+
+    public void viewUserBookings() {
+        Booking[] bookings = bookingServiceDao.viewAllBookings();
+
+        String customerId = takeCustomerId();
+
+        List<Booking> filteredBookings = Arrays.stream(bookings)
+                .filter(Objects::nonNull)
+                .filter(booking -> booking.getUser().getId().toString().equals(customerId))
+                .toList();
+
+        printBookings(filteredBookings);
     }
 
     private String takeCustomerId() {
         System.out.println("Please provide your ID");
         String customerID = takeCustomerInput();
 
-        UserService userService = new UserService();
-        User[] users = userService.viewAllUsers();
+        UserDao userDao = new UserDao();
+        User[] users = userDao.getUsers();
 
         String customer = null;
 
@@ -52,44 +86,26 @@ public class BookingService {
         return customer;
     }
 
-    private Car[] doYouWantElectricalCar() {
-        System.out.println("Do you want to get an electrical car?");
-        String isElectrical = takeCustomerInput();
-
+    private Car chooseCarByRegNumber() {
         CarService carService = new CarService();
+        Car[] cars = carService.viewAvailableCars();
+        System.out.println("Please specify registration number");
 
-        if (isElectrical.equals("true")) {
-            return carService.viewAvailableElectricCars();
-        } else if (isElectrical.equals("false")) {
-            return carService.viewAvailableCars();
-        } else {
-            System.out.println("Please provide correct answer true or false");
-            doYouWantElectricalCar();
-            return null;
-        }
-    }
-
-    private Car takeCarBrand(Car[] cars) {
-        System.out.println("Please specify what brand you want to book");
-        String carBrand = takeCustomerInput();
+        String regNumber = takeCustomerInput();
         for (Car car : cars) {
-            if (car.getBrand().toString().equals(carBrand)) {
+            if (car.getRegNumber() == Integer.parseInt(regNumber)) {
                 return car;
             }
         }
         return null;
     }
 
-    public void viewAllBookings() {
-        Booking [] bookings =bookingServiceDao.viewAllBookings();
-        Arrays.stream(bookings)
-                .forEach(System.out::println);
-    }
-
-    public void viewUserBookings() {
-        System.out.println("Please provide your ID");
-        Booking [] bookings =bookingServiceDao.viewUserBookings(takeCustomerInput());
-        Arrays.stream(bookings)
-                .forEach(System.out::println);
+    private static void printBookings(List<Booking> filteredBookings) {
+        if (filteredBookings.size() == 0) {
+            System.out.println("There is no bookings");
+        } else {
+            filteredBookings
+                    .forEach(System.out::println);
+        }
     }
 }

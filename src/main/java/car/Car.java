@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Car {
 
+   private int regNumber;
    private Brand brand;
    private int price;
    private boolean isElectrical;
+   private boolean isTaken;
 }

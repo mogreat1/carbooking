@@ -1,14 +1,21 @@
 package user;
 
+import java.util.Arrays;
+
 public class UserService {
 
-    private UserDao userDao;
+    private final UserDao userDao;
 
     {
         userDao = new UserDao();
     }
 
     public User[] viewAllUsers() {
-         return userDao.getUsers();
+        User[] users = userDao.getUsers();
+
+        Arrays.stream(users)
+                .forEach(System.out::println);
+
+        return users;
     }
 }

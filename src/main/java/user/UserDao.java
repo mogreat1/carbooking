@@ -1,6 +1,5 @@
 package user;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 public class UserDao {
@@ -15,8 +14,15 @@ public class UserDao {
     }
 
     public User[] getUsers() {
-        Arrays.stream(users)
-                .forEach(System.out::println);
         return users;
+    }
+
+    public static User getUser(String uuid) {
+        for (User user : users) {
+            if (user.getId().toString().equals(uuid)) {
+                return user;
+            }
+        }
+        return null;
     }
 }

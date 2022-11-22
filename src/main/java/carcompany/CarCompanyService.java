@@ -9,14 +9,14 @@ import static Utils.CustomerInputUtil.takeCustomerInput;
 
 public class CarCompanyService {
 
-    {
+    static {
         System.out.println("Hello, please choose what you want");
     }
 
     public void showStartMenu() {
         System.out.println("" +
                 "1️⃣ - Book Car\n" +
-                "2️⃣ - View All User Booked Cars\n" +
+                "2️⃣ - View User Booked Cars\n" +
                 "3️⃣ - View All Bookings\n" +
                 "4️⃣ - View Available Cars\n" +
                 "5️⃣ - View Available Electric Cars\n" +
@@ -34,7 +34,7 @@ public class CarCompanyService {
 
 
         switch (choice) {
-            case "1" -> {
+            case "1" -> {//finish this step, the same as amigos did
                 bookingService.bookCar();
                 showStartMenu();
             }

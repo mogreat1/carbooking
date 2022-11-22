@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class CarService {
 
-    private CarDao carDao;
+    private final CarDao carDao;
 
     {
         carDao = new CarDao();
@@ -16,6 +16,7 @@ public class CarService {
         Car[] cars = carDao.getCars();
 
         Arrays.stream(cars)
+                .filter(car -> !car.isTaken())
                 .forEach(System.out::println);
 
         return carDao.getCars();
@@ -26,13 +27,9 @@ public class CarService {
         Car[] cars = carDao.getCars();
         Car[] electricalCars = new Car[cars.length];
 
-        for (int i = 0; i < cars.length; i++) {
-            if (cars[i].isElectrical()) {
-                electricalCars[i] = cars[i];
-            }
-        }
-
-        Arrays.stream(electricalCars)
+        Arrays.stream(cars)
+                .filter(Car::isElectrical)
+                .filter(car -> !car.isTaken())
                 .forEach(System.out::println);
 
         return electricalCars;
